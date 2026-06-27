@@ -6,7 +6,7 @@ A web-based application that uses AI to generate plain-English explanations of c
 
 ### Core Features
 - ✅ Accept code snippets in **Python** and **JavaScript**
-- ✅ Generate AI-powered plain-English explanations (2-4 sentences)
+- ✅ Generate structured AI-powered code explanations in plain English
 - ✅ Store and manage multiple code snippets
 - ✅ Beautiful, responsive web interface
 - ✅ View full history of submitted code snippets
@@ -15,8 +15,6 @@ A web-based application that uses AI to generate plain-English explanations of c
 ### Bonus Features
 - ✨ AI-suggested code optimization
 - ✨ Time/Space complexity analysis
-- ✨ Syntax-highlighted code display
-- ✨ Modal view for detailed snippet information
 - ✨ Persistent storage using H2 database
 
 ## 🏗️ System Architecture
@@ -43,7 +41,7 @@ A web-based application that uses AI to generate plain-English explanations of c
 ┌─────────────────────────────────────────────────────┐
 │             Data Layer & External APIs              │
 │  - H2 Embedded Database (persistent storage)        │
-│  - OpenAI API (AI explanations)                     │
+│  - Groq API (AI-powered code analysis)              │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -64,7 +62,7 @@ A web-based application that uses AI to generate plain-English explanations of c
 - **Vanilla JavaScript** - Interactivity and API calls
 
 ### AI
-- **OpenAI API** - GPT-3.5-turbo model for code explanations
+- **Groq API** - Llama 3 8B 8192 for code explanations
 
 ## 📦 Project Structure
 
@@ -93,7 +91,6 @@ code-explainer-app/
 │   │       └── static/
 │   │           └── index.html            # Frontend UI
 │   └── test/                              # Test files
-└── target/                                # Build output
 ```
 
 ## 🚀 Quick Start
@@ -101,151 +98,51 @@ code-explainer-app/
 ### Prerequisites
 - Java 17 or higher
 - Maven 3.6+
-- OpenAI API key (optional, but recommended)
+- Groq API key (required for AI explanations)
 
 ### Installation & Setup
 
 1. **Clone/Download the project**
    ```bash
+   git clone <repo-url>
    cd code-explainer-app
    ```
 
-2. **Configure OpenAI API Key**
+2. **Configure Groq API Key**
    
-   **Option A: Environment Variable (Recommended)**
    ```bash
-   # On Linux/Mac
-   export OPENAI_API_KEY="your-api-key-here"
-   
-   # On Windows
-   set OPENAI_API_KEY=your-api-key-here
-   ```
+   #Update application.properties
 
-   **Option B: Edit application.properties**
-   ```bash
-   # Edit src/main/resources/application.properties
-   openai.api.key=your-api-key-here
+   openai.api.key=YOUR_GROQ_API_KEY
+   openai.api.model=llama3-8b-8192
+   openai.api.url=https://api.groq.com/openai/v1/chat/completions
    ```
-
-   > Get your OpenAI API key from: https://platform.openai.com/api-keys
 
 3. **Build the project**
    ```bash
-   mvn clean package
+   mvn clean install
    ```
 
 4. **Run the application**
    ```bash
    mvn spring-boot:run
    ```
-   
-   Or run the JAR directly:
-   ```bash
-   java -jar target/code-explainer-app-1.0.0.jar
-   ```
 
 5. **Access the application**
    - Open your browser and go to: **http://localhost:8080**
    - The frontend will load automatically
 
-### Verify Installation
-```bash
-# Check API health
-curl http://localhost:8080/api/code/health
-```
-
-Expected response:
-```json
-{
-  "status": "UP",
-  "message": "Code Explainer API is running"
-}
-```
 
 ## 📚 API Endpoints
 
-### Base URL
-```
-http://localhost:8080/api/code
-```
-
-### 1. Explain Code
-**Endpoint:** `POST /explain`
-
-**Request Body:**
-```json
-{
-  "code": "def hello():\n    print('Hello')",
-  "language": "python",
-  "title": "Hello Function",
-  "includeOptimization": true,
-  "includeComplexity": true
-}
-```
-
-**Response:**
-```json
-{
-  "id": 1,
-  "code": "def hello():\n    print('Hello')",
-  "language": "python",
-  "title": "Hello Function",
-  "explanation": "This Python function defines a simple hello world function...",
-  "complexity": "Time Complexity: O(1), Space Complexity: O(1)",
-  "optimizedCode": "def hello(name='World'):\n    print(f'Hello {name}')",
-  "optimizationNotes": "AI-suggested optimization",
-  "tokensUsed": 250,
-  "createdAt": "2024-01-15 10:30:45"
-}
-```
-
-### 2. Get All Snippets
-**Endpoint:** `GET /snippets`
-
-**Response:**
-```json
-[
-  {
-    "id": 1,
-    "code": "...",
-    "language": "python",
-    "title": "Hello Function",
-    "explanation": "...",
-    "createdAt": "2024-01-15 10:30:45"
-  }
-]
-```
-
-### 3. Get Snippet by ID
-**Endpoint:** `GET /snippets/{id}`
-
-**Response:** Same as explain code response
-
-### 4. Update Snippet
-**Endpoint:** `PUT /snippets/{id}`
-
-**Request Body:** Same as explain code request
-
-### 5. Delete Snippet
-**Endpoint:** `DELETE /snippets/{id}`
-
-**Response:**
-```json
-{
-  "message": "Snippet deleted successfully"
-}
-```
-
-### 6. Health Check
-**Endpoint:** `GET /health`
-
-**Response:**
-```json
-{
-  "status": "UP",
-  "message": "Code Explainer API is running"
-}
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/code/explain` | Generate code explanation |
+| GET | `/api/code/snippets` | Fetch all saved snippets |
+| GET | `/api/code/snippets/{id}` | Fetch snippet by ID |
+| PUT | `/api/code/snippets/{id}` | Update existing snippet |
+| DELETE | `/api/code/snippets/{id}` | Delete snippet |
+| GET | `/api/code/health` | Health check |
 
 ## 🎯 Usage Guide
 
@@ -259,6 +156,9 @@ http://localhost:8080/api/code
    - Check options for optimization/complexity analysis
 3. **Click "Explain Code"**
 4. **View the results** in the explanation panel with multiple tabs
+<img width="1662" height="890" alt="Screenshot 2026-06-27 184513" src="https://github.com/user-attachments/assets/0d323504-0148-42ab-9458-7e6f96e5f3a0" />
+<img width="750" height="800" alt="Screenshot 2026-06-27 184523" src="https://github.com/user-attachments/assets/7441789b-1dbe-4f48-8d43-86e88904ec8c" />
+<img width="757" height="787" alt="Screenshot 2026-06-27 184536" src="https://github.com/user-attachments/assets/4ba7cf77-2035-4817-89e0-5e0d1d8b6a4e" />
 
 ### Managing Snippets
 
@@ -266,6 +166,7 @@ http://localhost:8080/api/code
 - **Click a snippet** - View full details in a modal
 - **Edit snippet** - Click "Edit" to modify and re-explain
 - **Delete snippet** - Click "Delete" to remove a snippet
+<img width="1552" height="523" alt="Screenshot 2026-06-27 184548" src="https://github.com/user-attachments/assets/68ec5584-6cce-45da-a189-76bc48c9ee4f" />
 
 ## 🔒 Error Handling & Hallucinations
 
@@ -299,112 +200,12 @@ http://localhost:8080/api/code
 - ✅ Don't rely solely on complexity analysis
 - ✅ Use for learning, not production decisions
 
-## 🧪 Testing
-
-### Manual Testing
-
-```bash
-# Test health endpoint
-curl http://localhost:8080/api/code/health
-
-# Test code explanation (requires OpenAI API key)
-curl -X POST http://localhost:8080/api/code/explain \
-  -H "Content-Type: application/json" \
-  -d '{
-    "code": "x = [1, 2, 3]\ny = [i*2 for i in x]",
-    "language": "python",
-    "title": "List Comprehension"
-  }'
-
-# Get all snippets
-curl http://localhost:8080/api/code/snippets
-
-# Get specific snippet
-curl http://localhost:8080/api/code/snippets/1
-
-# Delete snippet
-curl -X DELETE http://localhost:8080/api/code/snippets/1
-```
-
-## 🐳 Docker Deployment (Optional)
-
-Create a `Dockerfile`:
-
-```dockerfile
-FROM maven:3.8.1-openjdk-17 AS build
-WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
-
-FROM openjdk:17-jdk-slim
-WORKDIR /app
-COPY --from=build /app/target/code-explainer-app-1.0.0.jar app.jar
-EXPOSE 8080
-CMD ["java", "-jar", "app.jar"]
-```
-
-Build and run:
-```bash
-docker build -t code-explainer .
-docker run -p 8080:8080 -e OPENAI_API_KEY="your-key" code-explainer
-```
-
 ## 📊 Database
 
 The application uses **H2 embedded database** for storage:
 
 - **Database URL:** `jdbc:h2:mem:codeexplainerdb`
 - **Console:** Available at `http://localhost:8080/h2-console`
-- **Username:** `sa`
-- **Password:** (empty)
-
-### Database Schema
-
-**Table: code_snippets**
-| Column | Type | Description |
-|--------|------|-------------|
-| id | BIGINT | Primary key |
-| code | VARCHAR(5000) | Code snippet |
-| language | VARCHAR(50) | python or javascript |
-| explanation | VARCHAR(2000) | AI explanation |
-| title | VARCHAR(500) | Snippet title |
-| complexity | VARCHAR(1000) | Complexity analysis |
-| optimized_code | VARCHAR(5000) | Suggested optimization |
-| optimization_notes | VARCHAR(1000) | Optimization notes |
-| tokens_used | INT | API tokens used |
-| created_at | TIMESTAMP | Creation time |
-| updated_at | TIMESTAMP | Last update time |
-
-## 🎨 Frontend Features
-
-- **Responsive Design** - Works on desktop and mobile
-- **Gradient UI** - Modern purple gradient theme
-- **Syntax Highlighting** - Code display with monospace font
-- **Tab Navigation** - Organized result sections
-- **Modal Details** - Full snippet details in modal
-- **Loading Indicators** - Spinner during API calls
-- **Error Messages** - Clear feedback for failures
-- **Smooth Animations** - Hover effects and transitions
-
-## 📝 Configuration
-
-Edit `src/main/resources/application.properties`:
-
-```properties
-# Server
-server.port=8080
-
-# Database
-spring.datasource.url=jdbc:h2:mem:codeexplainerdb
-spring.jpa.hibernate.ddl-auto=create-drop
-
-# OpenAI
-openai.api.key=${OPENAI_API_KEY:}
-openai.api.model=gpt-3.5-turbo
-
-# Logging
-logging.level.com.codeexplainer=DEBUG
-```
 
 ## 🚨 Troubleshooting
 
@@ -413,12 +214,8 @@ logging.level.com.codeexplainer=DEBUG
 # Change port in application.properties
 server.port=8081
 ```
-
-### OpenAI API Key Not Working
-- Verify key at: https://platform.openai.com/account/api-keys
-- Check API usage and billing
-- Ensure key has sufficient balance
-- Application works without key (with default explanations)
+### Groq API Key Not Working
+- Verify key at: https://console.groq.com/keys
 
 ### Database Issues
 - H2 database resets on each restart (in-memory)
@@ -436,7 +233,7 @@ server.port=8081
 - [ ] Support for more languages (Java, C++, Go, Rust)
 - [ ] Code diff comparison feature
 - [ ] User authentication and personal saved snippets
-- [ ] Syntax highlighting in code display
+- [ ] Syntax highlighting
 - [ ] Export snippets as PDF/Markdown
 - [ ] Integration with GitHub
 - [ ] Code performance benchmarking
@@ -444,24 +241,24 @@ server.port=8081
 
 ## 📄 License
 
-This project is open-source and available for educational and commercial use.
+Open source for educational and learning purposes.
 
 ## 🤝 Support
 
 For issues or questions:
 1. Check the troubleshooting section
 2. Review API endpoint documentation
-3. Verify OpenAI API configuration
+3. Verify Groq API configuration
 
 ## 📞 AI Model Information
 
-- **Primary Model:** GPT-3.5-turbo
+- **Primary Model:** Groq - Llama 3 8B 8192
 - **Alternative Models:** GPT-4, Claude, Mistral
-- **Max Tokens:** 500 per request
+- **Max Tokens:** 800 per request
 - **Temperature:** 0.7 (balanced creativity and accuracy)
 
 ---
+## Author
+Adesh Ghodekar
 
 **Built with ❤️ using Spring Boot and AI**
-
-Happy coding! 🚀
