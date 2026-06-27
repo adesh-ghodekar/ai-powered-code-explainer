@@ -1,0 +1,40 @@
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Maven
+target/
+*.jar
+*.war
+*.ear
+.m2/
+
+# Gradle
+.gradle/
+build/
+
+# Spring Boot
+application-*.properties
+*.log
+
+# Database
+data/
+*.db
+*.h2.db
+
+# Environment
+.env
+.env.local
+
+# Node (if using npm)
+node_modules/
+package-lock.json
+yarn.lock
+
+# OS
+.DS_Store
+Thumbs.db
